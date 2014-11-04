@@ -22,8 +22,8 @@ int main(int argc, char **argv) {
         std::clog << "Initial dictionary:" << std::endl;
         lp::store(std::clog, dict);
         std::clog << std::endl;
-        lp::Move offsets = lp::Simplex::blandsRule(dict);
-        if (offsets.basic >= dict.m || offsets.non_basic >= dict.n) {
+        lp::Move offsets = lp::Simplex::blands_rule(dict);
+        if (offsets.basic >= dict.m && offsets.non_basic < dict.n) {
             std::cout << "UNBOUNDED";
         } else {
             std::cout << dict.non_basic_indices[offsets.non_basic] << std::endl;

@@ -2,18 +2,19 @@
 #include "dictionary.h"
 
 #include <cmath>
+#include <iostream>
 
 namespace lp {
-    const double Simplex::EPSILON = 1e-3;
+    const double Simplex::EPSILON = 1e-15;
     const double Simplex::MVAL = 1e9;
 
-    Move Simplex::blandsRule(const Dictionary &dict) {
+    Move Simplex::blands_rule(const Dictionary &dict) {
         Move offsets = {dict.m, dict.n};
-        Move indices = {dict.m+dict.n, dict.m+dict.n};
+        Move indices = {dict.m+dict.n+1, dict.m+dict.n+1};
 
         // select entering variable
         for (size_t j = 0; j < dict.n; ++j) {
-            if (dict.c[j] > EPSILON) {
+            if (dict.c[j] > 0.0) {
                 if (dict.non_basic_indices[j] < indices.non_basic) {
                     indices.non_basic = dict.non_basic_indices[j];
                     offsets.non_basic = j;
@@ -21,24 +22,26 @@ namespace lp {
             }
         }
 
+        if (offsets.non_basic == dict.n) {
+            return offsets;
+        }
+
         // select leaving variable
         double min_value = MVAL;
         for (size_t i = 0; i < dict.m; ++i) {
             if (dict.a[i*dict.n + offsets.non_basic] < -EPSILON) {
                 double value = -1.0 * dict.b[i]/dict.a[i*dict.n + offsets.non_basic] ;
-                // 1. the same
-                if (fabs(value-min_value) < EPSILON) {
+
+                if (value < min_value) {  // less
+                    min_value = value;
+                    indices.basic = dict.basic_indices[i];
+                    offsets.basic = i;
+                } else if (fabs(value-min_value) < EPSILON) {  // the same
                     if (indices.basic > dict.basic_indices[i]) {
                         min_value = value;
                         indices.basic = dict.basic_indices[i];
                         offsets.basic = i;
                     }
-                }
-                // 2. less
-                else if (value < min_value) {
-                    min_value = value;
-                    indices.basic = dict.basic_indices[i];
-                    offsets.basic = i;
                 }
             }
         }
@@ -77,5 +80,30 @@ namespace lp {
             dict.c[j] += dict.a[offsets.basic*dict.n + j] * factor;
         }
         dict.value += dict.b[offsets.basic]*factor;
+    }
+
+    SolutionInfo Simplex::solve(const Dictionary &initial_dict) {
+        Dictionary dict = initial_dict;
+        std::clog << "Initial dictionary:" << std::endl;
+        lp::store(std::clog, dict);
+        std::clog << std::endl;
+        Move offsets = blands_rule(dict);
+        SolutionInfo info = {0};
+        while (offsets.basic < dict.m && offsets.non_basic < dict.n) {
+            pivot(offsets, dict);
+            std::clog << "enters: x" << dict.non_basic_indices[offsets.non_basic];
+            std::clog << ", leaves: x" << dict.basic_indices[offsets.basic] << std::endl;
+            lp::store(std::clog, dict);
+            std::clog << std::endl;
+            ++info.num_steps;
+            offsets = blands_rule(dict);
+        }
+        if (offsets.non_basic < dict.n) {
+            info.unbounded = true;
+        } else {
+            info.value = dict.value;
+        }
+
+        return info;
     }
 }

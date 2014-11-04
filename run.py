@@ -7,7 +7,8 @@ import subprocess
 sys.path.append('configs')
 
 # import homework settings
-import config21 as config
+# import config21 as config  # Homework 2.1
+import config22 as config  # Homework 2.2
 
 def run_solver(args):
     process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -73,7 +74,8 @@ def main():
         test_base_path = os.path.join(config.test_path, test)
         if not run_test(test_base_path, test_base_path+config.test_result_ext):
             tests_failed += 1
-    shutil.rmtree(config.task_result_path)
+    if os.path.exists(config.task_result_path):
+        shutil.rmtree(config.task_result_path)
     os.mkdir(config.task_result_path)
     if tests_failed == 0:
         for task in config.tasks:
