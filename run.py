@@ -1,0 +1,91 @@
+import sys
+import os
+import os.path
+import shutil
+import subprocess
+
+sys.path.append('configs')
+
+# import homework settings
+import config21 as config
+
+def run_solver(args):
+    process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    return_code = process.returncode
+    return return_code, stdout, stderr
+
+def check_results(result, pattern):
+    SEP = '\n'
+    EPS = 0.001
+    discreps = []
+    for result_line, pattern_line in zip(result.split(SEP), pattern.split(SEP)):
+        result_line = result_line.strip()
+        pattern_line = pattern_line.strip()
+        equals = result_line == pattern_line
+        if not equals:
+            try:
+                result_val = float(result_line)
+                pattern_val = float(pattern_line)
+                equals = abs(result_val - pattern_val) < EPS
+            except:
+                pass
+        if not equals:
+            discreps.append((result_line, pattern_line))
+    return discreps
+
+def run_test(test_path, result_path):
+    test_name = os.path.basename(test_path)
+    return_code, data, debug_data = run_solver([config.binary_path, test_path])
+    if return_code != 0:
+        print 'running', test_name, 'FAILED with return code =', return_code
+        print 'stdout: <<', data, '>>'
+        print 'stderr: <<', debug_data, '>>'
+        return False
+    result = True
+    with open(result_path, 'r') as f:
+        result_data = f.read()
+    discreps = check_results(data, result_data)
+    result = len(discreps) == 0
+    if discreps:
+        print test_name, 'FAILED'
+        print debug_data
+        for result_line, pattern_line in discreps:
+            print '\tobtained:', result_line, 'but expected:', pattern_line
+    return result
+
+def run_task(task_path, result_path):
+    task_name = os.path.basename(task_path)
+    return_code, data, debug_data = run_solver([config.binary_path, task_path])
+    if return_code != 0:
+        print 'running', task_name, 'FAILED with return code =', return_code
+        print 'stdout: <<', data, '>>'
+        print 'stderr: <<', debug_data, '>>'
+        return False
+    with(open(result_path, 'w')) as f:
+        f.write(data)
+    return True
+
+def main():
+    tests_failed = 0
+    tasks_failed = 0
+    for test in config.tests:
+        test_base_path = os.path.join(config.test_path, test)
+        if not run_test(test_base_path, test_base_path+config.test_result_ext):
+            tests_failed += 1
+    shutil.rmtree(config.task_result_path)
+    os.mkdir(config.task_result_path)
+    if tests_failed == 0:
+        for task in config.tasks:
+            task_path = os.path.join(config.task_path, task)
+            result_path = os.path.join(config.task_result_path, task) + config.test_result_ext
+            if not run_task(task_path, result_path):
+                tasks_failed += 1
+
+    print 'Tests Failed', tests_failed, 'from', len(config.tests)
+    if tests_failed != 0:
+        print '\tno tasks have been run dut to failed tests'
+    else:
+        print 'Tasks Failed', tasks_failed, 'from', len(config.tasks)
+
+main()

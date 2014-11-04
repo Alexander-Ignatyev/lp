@@ -1,0 +1,7 @@
+build
+results/result*
+*.pyc
+
+# OS X Files
+.DS_Store
+
