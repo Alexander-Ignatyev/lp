@@ -70,23 +70,20 @@ def run_task(task_path, result_path):
 def main():
     tests_failed = 0
     tasks_failed = 0
-    for test in config.tests:
-        test_base_path = os.path.join(config.test_path, test)
-        if not run_test(test_base_path, test_base_path+config.test_result_ext):
+    for test, test_result in zip(config.tests, config.test_results):
+        if not run_test(test, test_result):
             tests_failed += 1
     if os.path.exists(config.task_result_path):
         shutil.rmtree(config.task_result_path)
     os.mkdir(config.task_result_path)
     if tests_failed == 0:
-        for task in config.tasks:
-            task_path = os.path.join(config.task_path, task)
-            result_path = os.path.join(config.task_result_path, task) + config.test_result_ext
-            if not run_task(task_path, result_path):
+        for task, task_result in zip(config.tasks, config.task_results):
+            if not run_task(task, task_result):
                 tasks_failed += 1
 
     print 'Tests Failed', tests_failed, 'from', len(config.tests)
     if tests_failed != 0:
-        print '\tno tasks have been run dut to failed tests'
+        print '\tno tasks have been run due to failed tests'
     else:
         print 'Tasks Failed', tasks_failed, 'from', len(config.tasks)
 
