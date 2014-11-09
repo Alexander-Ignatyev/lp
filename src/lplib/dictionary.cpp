@@ -3,6 +3,19 @@
 #include <iostream>
 
 namespace lp {
+    void Dictionary::swap(Dictionary &lhs) {
+        using std::swap;
+
+        swap(m, lhs.m);
+        swap(n, lhs.n);
+        swap(basic_indices, lhs.basic_indices);
+        swap(non_basic_indices, lhs.non_basic_indices);
+        swap(a, lhs.a);
+        swap(b, lhs.b);
+        swap(c, lhs.c);
+        swap(value, lhs.value);
+    }
+
     void alloc_dictionary(size_t m, size_t n, Dictionary &dict) {
         dict.m = n;
         dict.n = n;

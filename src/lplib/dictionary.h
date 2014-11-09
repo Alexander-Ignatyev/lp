@@ -13,8 +13,13 @@ namespace lp {
         std::vector<double> a;  // matrix A[m*n]
         std::vector<double> c;  // objective coefficients c[n]
         double value;
+        void swap(Dictionary &lhs);
     };
 
     bool load(std::istream &is, Dictionary &dict);
     void store(std::ostream &os, const Dictionary &dict);
+
+    inline void swap(Dictionary &rhs, Dictionary &lhs) {
+        rhs.swap(lhs);
+    }
 }

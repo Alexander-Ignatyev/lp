@@ -20,9 +20,9 @@ int main(int argc, char **argv) {
             std::cerr << "ERROR: Cannot load dictionary from " << argv[i] << std::endl;
         }
         lp::SolutionInfo info = lp::Simplex::solve(dict);
-        if (info.unbounded) {
+        if (info.state == lp::SolutionInfo::Unbounded) {
             std::cout << "UNBOUNDED" << std::endl;
-        } else {
+        } else if (info.state == lp::SolutionInfo::Final) {
             std::cout << info.value << std::endl;
             std::cout << info.num_steps;
         }

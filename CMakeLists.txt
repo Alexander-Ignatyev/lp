@@ -16,3 +16,7 @@ target_link_libraries(homework21 lplib)
 # Homework 2.2
 add_executable(homework22 src/homework22/main.cpp)
 target_link_libraries(homework22 lplib)
+
+# Homework 3.1
+add_executable(homework31 src/homework31/main.cpp)
+target_link_libraries(homework31 lplib)

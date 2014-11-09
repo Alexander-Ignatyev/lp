@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 namespace lp {
     const double Simplex::EPSILON = 1e-15;
@@ -84,7 +85,96 @@ namespace lp {
 
     SolutionInfo Simplex::solve(const Dictionary &initial_dict) {
         Dictionary dict = initial_dict;
-        std::clog << "Initial dictionary:" << std::endl;
+        if (!is_feasible(dict)) {
+            SolutionInfo info = initialize(dict);
+            if (info.state == SolutionInfo::Unbounded) {
+                info.state = SolutionInfo::Infeasible;
+                return info;
+            }
+        }
+        return optimize(dict);
+    }
+
+    Dictionary Simplex::get_dual_dictionary(const Dictionary &dict) {
+        Dictionary dual;
+        dual.m = dict.n;
+        dual.n = dict.m;
+        dual.basic_indices = dict.non_basic_indices;
+        dual.non_basic_indices = dict.basic_indices;
+        dual.b = dict.c;
+        dual.c = dict.b;
+        transpose(dict.a, dict.n, dual.a);
+        dual.value = dict.value;
+
+        multiply_by(dual.a, -1);
+        multiply_by(dual.b, -1);
+        multiply_by(dual.c, -1);
+        dual.value *= -1;
+        return dual;
+    }
+
+    void Simplex::transpose(const std::vector<double> &from, size_t cols, std::vector<double> &to) {
+        size_t rows = from.size()/cols;
+        to.resize(from.size());
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                to[j*rows+i] = from[i*cols+j];
+            }
+        }
+    }
+
+    void Simplex::multiply_by(std::vector<double> &v, double value) {
+        for (size_t i = 0; i < v.size(); ++i) {
+            v[i] *= value;
+        }
+    }
+
+    bool Simplex::is_feasible(const Dictionary &dict) {
+        for (size_t i = 0; i < dict.m; ++i) {
+            if (dict.b[i] < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    SolutionInfo Simplex::initialize(Dictionary &dict) {
+        Dictionary dual = get_dual_dictionary(dict);
+        std::fill(dual.b.begin(), dual.b.end(), 1);
+        SolutionInfo info = optimize(dual);
+        if (info.state == SolutionInfo::Final) {
+            Dictionary feas = get_dual_dictionary(dual);
+            std::fill(feas.c.begin(), feas.c.end(), 0);
+
+            std::vector<double> factors(dict.m+dict.n+1, 0);
+            for (size_t i = 0; i < dict.n; ++i) {
+                factors[dict.non_basic_indices[i]] = dict.c[i];
+            }
+            feas.value = dict.value;
+
+            for (size_t i = 0; i < feas.m; ++i) {
+                double factor = factors[feas.basic_indices[i]];
+                if (fabs(factor) < EPSILON) {
+                    continue;
+                }
+                for (size_t j = 0; j < feas.n; ++j) {
+                    feas.c[j] += factor*feas.a[i*feas.n+j];
+                }
+                feas.value += factor*feas.b[i];
+            }
+            for (size_t j = 0; j < feas.n; ++j) {
+                double factor = factors[feas.non_basic_indices[j]];
+                if (fabs(factor) > EPSILON) {
+                    feas.c[j] += factor;
+                }
+            }
+            dict.swap(feas);
+        }
+        return info;
+    }
+
+    SolutionInfo Simplex::optimize(Dictionary &dict) {
+        std::clog << "Initial feasible dictionary:" << std::endl;
         lp::store(std::clog, dict);
         std::clog << std::endl;
         Move offsets = blands_rule(dict);
@@ -99,8 +189,9 @@ namespace lp {
             offsets = blands_rule(dict);
         }
         if (offsets.non_basic < dict.n) {
-            info.unbounded = true;
+            info.state = SolutionInfo::Unbounded;
         } else {
+            info.state = SolutionInfo::Final;
             info.value = dict.value;
         }
 
