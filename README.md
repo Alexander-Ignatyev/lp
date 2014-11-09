@@ -30,3 +30,21 @@ To import settings of the homework use **import** instruction in the beginning o
 
     # import homework settings
     import config21 as config
+
+### Convex Optimisation: Resources
+
+#### Convex Optimization by Boyd and Vandenberghe
+
+[Free e-book page](http://web.stanford.edu/~boyd/cvxbook/)
+
+#### EE103 - Applied Numerical Computing by Vandenberghe
+[Course page](http://www.seas.ucla.edu/~vandenbe/ee103.html) (see least-squares and least-norm pages)
+
+[Prof. L. Vandenberghe page](http://www.seas.ucla.edu/~vandenbe/index.html)
+
+#### CVX examples
+[CVX examples page](http://cvxr.com/cvx/examples/)
+Figures, examples, and exercises from the book Convex Optimization -> Chapter 6: Approximation and fitting -> Quadratic smoothing
+
+#### CVXOPT examples
+[CVXOPT examples page](http://cvxopt.org/examples/index.html) especially see [Quadratic smoothing](http://cvxopt.org/examples/book/smoothrec.html) and [Penalty function approximation](http://cvxopt.org/examples/book/penalties.html)
