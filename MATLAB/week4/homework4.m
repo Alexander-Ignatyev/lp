@@ -1,6 +1,6 @@
 close all
 clc 
-close all
+clear all
 
 % l_2
 Data = dlmread('Data_Corr.txt');
