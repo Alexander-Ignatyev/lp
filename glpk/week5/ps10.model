@@ -1,0 +1,31 @@
+# Problem Sets 5: Question 10
+# A county has 'n' towns.
+# A corporation wishes to build supermarkets to serve the people in the county.
+# For each town, the corporation can choose to or not to build a super market there.
+# No town can have more than one super-market.
+# We would like to minimize the total cost of super-markets built.
+# Table 'costs' shows the cost of built for each town.
+# Each town must have a super-market within a 'max_distance' minute driving time.
+# The table 'distance_matrix' shows the driving times between the towns.
+
+param n;
+
+param costs{j in 1..10};
+
+param max_distance;
+
+param distance_matrix {i in 1..n, j in 1..n};
+
+param mask_matrix {i in 1..n, j in 1..n} :=
+    if distance_matrix[i, j] <= 20 then 1 else 0;
+
+var x {j in 1..n} binary;
+
+minimize total_cost: sum {j in 1..n} x[j] * costs[j];
+c{i in 1..n}: sum {j in 1..n}  mask_matrix[i,j]*x[j] >= 1;
+
+solve;
+
+display total_cost;
+display x;
+end;

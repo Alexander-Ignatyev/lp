@@ -1,6 +1,7 @@
 build
 results/result*
 *.pyc
+*.out
 
 # OS X Files
 .DS_Store
