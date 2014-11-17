@@ -1,0 +1,20 @@
+set Foods;
+set Nutrients;
+param caloricMatrix { i in Foods, j in Nutrients};
+param bounds { i in Nutrients, j in 1..2};
+param costs { i in Foods};
+
+var x { i in Foods} >= 0;
+
+minimize obj: sum{i in Foods} costs[i] * x[i];
+
+s.t. bndConstr {k in Nutrients}: bounds[k,1] <= sum{i in Foods} x[i] * caloricMatrix[i,k] <= bounds[k,2];
+
+solve;
+
+display x;
+printf '----- \n';
+printf {i in Foods: x[i] >= 0.001}: 'Optimizer says to eat %f units of food %s \n', x[i], i;
+printf ' The bill for the food will be \$ %f \n', obj;
+printf 'Bon appetit! \n -----\n';
+end;

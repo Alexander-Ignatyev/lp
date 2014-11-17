@@ -1,0 +1,18 @@
+param NFoods;
+param NNutrients;
+
+param costs {j in 1..NFoods};
+param caloricData {j in 1..NFoods, i in 1..NNutrients};
+param upperBnd {i in 1..NNutrients};
+param lowerBnd {i in 1..NNutrients};
+
+var x {j in 1..NFoods} >= 0;
+
+minimize obj: sum {j in 1..NFoods} costs[j]*x[j];
+s.t.
+c{i in 1..NNutrients}: lowerBnd[i] <= sum {j in 1..NFoods} caloricData[j, i] * x[j]<= upperBnd[i];
+
+solve;
+display x;
+display obj;
+end;

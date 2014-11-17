@@ -48,3 +48,10 @@ Figures, examples, and exercises from the book Convex Optimization -> Chapter 6:
 
 #### CVXOPT examples
 [CVXOPT examples page](http://cvxopt.org/examples/index.html) especially see [Quadratic smoothing](http://cvxopt.org/examples/book/smoothrec.html) and [Penalty function approximation](http://cvxopt.org/examples/book/penalties.html)
+
+### Solvers
+
+#### GLPK
+[Homepage of GNU Lipear Programming Kit](http://www.gnu.org/software/glpk/)
+
+[GNU MathProg Tutorial](http://www.cs.unb.ca/~bremner/docs/glpk/gmpl.pdf)

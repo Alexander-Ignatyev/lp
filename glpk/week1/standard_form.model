@@ -1,0 +1,21 @@
+# number of constraints
+param m;
+# number of decision variable
+param n;
+
+# problem parameters
+param c {j in 1..n};
+param A {i in 1..m, j in 1..n};
+param b {i in 1..m};
+
+# declare variables
+var x {j in 1..n} >= 0;
+
+#objective
+maximize obj: sum{j in 1..n} c[j]*x[j];
+s.t.
+e{i in 1..m}: sum{j in 1..n} A[i, j]*x[j] <= b[i];
+
+solve;
+display x;
+end;
