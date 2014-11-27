@@ -3,25 +3,10 @@
 #include <cstring>
 #include <vector>
 
+#include "basic_types.h"
+
 namespace lp {
     struct Dictionary;
-
-    struct Move {
-        size_t basic;
-        size_t non_basic;
-    };
-
-    struct SolutionInfo {
-        double value;
-        size_t num_steps;
-        enum {
-            Infeasible = 1,
-            Feasible = 4,
-            Unbounded = 5,
-            Bounded = 6,
-            Final = 8
-        } state;
-    };
 
     class Simplex {
         static const double EPSILON;
@@ -35,10 +20,11 @@ namespace lp {
 
         static void transpose(const std::vector<double> &from, size_t cols, std::vector<double> &to);
 
-    private:
-        static void multiply_by(std::vector<double> &v, double value);
         static bool is_feasible(const Dictionary &dict);
         static SolutionInfo initialize(Dictionary &dict);
         static SolutionInfo optimize(Dictionary &dict);
+
+    private:
+        static void multiply_by(std::vector<double> &v, double value);
     };
 }

@@ -16,6 +16,13 @@ namespace lp {
         swap(value, lhs.value);
     }
 
+    void Dictionary::add_new_constraints(size_t num_constraints) {
+        m += num_constraints;
+        b.resize(m);
+        a.resize(m*n);
+        basic_indices.push_back(m+n);
+    }
+
     void alloc_dictionary(size_t m, size_t n, Dictionary &dict) {
         dict.m = n;
         dict.n = n;

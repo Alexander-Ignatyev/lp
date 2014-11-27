@@ -14,6 +14,7 @@ namespace lp {
         std::vector<double> c;  // objective coefficients c[n]
         double value;
         void swap(Dictionary &lhs);
+        void add_new_constraints(size_t num_constraints);
     };
 
     bool load(std::istream &is, Dictionary &dict);

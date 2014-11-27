@@ -9,7 +9,8 @@ sys.path.append('configs')
 # import homework settings
 # import config21 as config  # Homework 2.1
 # import config22 as config  # Homework 2.2
-import config31 as config  # Homework 3.1
+# import config31 as config  # Homework 3.1
+import config61 as config  # Homework 6.1
 
 def run_solver(args):
     process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

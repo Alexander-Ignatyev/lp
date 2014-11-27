@@ -5,6 +5,8 @@
 #include <iostream>
 #include <algorithm>
 
+// #define ENABLE_LOGGING
+
 namespace lp {
     const double Simplex::EPSILON = 1e-15;
     const double Simplex::MVAL = 1e9;
@@ -174,17 +176,21 @@ namespace lp {
     }
 
     SolutionInfo Simplex::optimize(Dictionary &dict) {
+#ifdef ENABLE_LOGGING
         std::clog << "Initial feasible dictionary:" << std::endl;
         lp::store(std::clog, dict);
         std::clog << std::endl;
+#endif  // ENABLE_LOGGING
         Move offsets = blands_rule(dict);
         SolutionInfo info = {0};
         while (offsets.basic < dict.m && offsets.non_basic < dict.n) {
             pivot(offsets, dict);
+#ifdef ENABLE_LOGGING
             std::clog << "enters: x" << dict.non_basic_indices[offsets.non_basic];
             std::clog << ", leaves: x" << dict.basic_indices[offsets.basic] << std::endl;
             lp::store(std::clog, dict);
             std::clog << std::endl;
+#endif  // ENABLE_LOGGING
             ++info.num_steps;
             offsets = blands_rule(dict);
         }
