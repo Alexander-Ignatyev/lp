@@ -17,7 +17,7 @@ param max_distance;
 param distance_matrix {i in 1..n, j in 1..n};
 
 param mask_matrix {i in 1..n, j in 1..n} :=
-    if distance_matrix[i, j] <= 20 then 1 else 0;
+    if distance_matrix[i, j] <= max_distance then 1 else 0;
 
 var x {j in 1..n} binary;
 
